@@ -22,7 +22,7 @@ def register():
         if error is None:
             db.execute('insert into user (username,password) values(?,?)',(username,generate_password_hash(password)))
             db.commit()
-            return redirect(url_for('auth.html'))
+            return redirect(url_for('auth.login'))
         flash(error)
 
     return render_template('auth/register.html')

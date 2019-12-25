@@ -31,14 +31,14 @@ def create():
             db = get_db()
             db.execute('insert into post (title,body,author_id) values(?,?,?)',(title,body,g.user['id'])) 
             db.commit()
-            return render_template(url_for('blog.index'))
+            return redirect(url_for('blog.index'))
     return render_template('blog/create.html')
 
 def get_post(id,check_author=True):
-    post = get_db().execute('SELECT p.id, title, body, created, author_id, username'
+    post = get_db().execute('SELECT p.id, p.title, p.body, p.created, p.author_id, u.username'
                             ' FROM post p JOIN user u ON p.author_id = u.id'
                             ' WHERE p.id = ?',
-                            (id,)).fetchall()
+                            (id,)).fetchone()
     if post is None:
         abort(404,"Post id {0} doesn't exist.".format(id))
     
@@ -67,11 +67,11 @@ def update(id):
             return redirect(url_for('blog.index'))
     return render_template('blog/update.html',post=post)
 
-    bp.route('/<int:id>/delete', methods=('POST',))
+@bp.route('/<int:id>/delete', methods=('POST',))
 @login_required
 def delete(id):
     get_post(id)
     db = get_db()
-    db.execute('datel from post where id=?',(id,))
+    db.execute('delete from post where id=?',(id,))
     db.commit()
     return redirect(url_for('blog.index'))
